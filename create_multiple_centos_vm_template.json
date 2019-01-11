@@ -50,7 +50,7 @@
             "type": "String",
 			"allowedValues": [
 			    "6.10",
-				"7.5"
+			    "7.5"
 			],
             "metadata": {
                 "description": "The Linux version for the VM. This will pick a fully patched image of this given Centos"
