@@ -45,18 +45,17 @@
                 "description": "This is the size of your VM"
             }
         },
-        "osType": {
-            "defaultValue": "Centos7.5",
+        "osImageSKU": {
+            "defaultValue": "7.5",
             "type": "String",
 			"allowedValues": [
-			    "Centos7.5",
-				"Centos6.10"
+			    "6.10",
+				"7.5"
 			],
             "metadata": {
-                "description": "Maps to the publisher in the Azure Stack Platform Image Repository manifest file."
+                "description": "The Linux version for the VM. This will pick a fully patched image of this given Centos"
             }
         }
-
     },
     "variables": {
         "availabilitySetName": "[toLower(concat('aSet-', resourceGroup().name))]",
@@ -79,6 +78,8 @@
         "rdpPort": 22,
         "nsgName": "[tolower(concat('vmnsg',resourceGroup().name))]",
         "nsgID": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('nsgName'))]",
+		"osImageOffer": "CentOS",
+		"osImagePublisher": "OpenLogic",
         "vmContainerName": "vhds"
     },
     "resources": [
@@ -104,7 +105,7 @@
                         "properties": {
                             "protocol": "*",
                             "sourcePortRange": "*",
-                            "destinationPortRange": "*",
+                            "destinationPortRange": "[variables('rdpPort')]",
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
@@ -120,7 +121,7 @@
             "name": "[variables('availabilitySetName')]",
             "location": "[resourceGroup().location]",
             "properties": {
-                "platformFaultDomainCount": "1",
+                "platformFaultDomainCount": "3",
                 "platformUpdateDomainCount": "1"
             }
         },
@@ -269,10 +270,9 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-					"condition": "[equals(parameters('osType'), 'Centos7.5'))]",
-                        "publisher": "OpenLogic",
-                        "offer": "CentOS",
-                        "sku": "7.5",
+                        "publisher": "[variables('osImagePublisher')]",
+                        "offer": "[variables('osImageOffer')]",
+                        "sku": "[parameters('osImageSKU')]",
                         "version": "[variables('osImageVersion')]"
                     },
                     "osDisk": {
