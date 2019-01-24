@@ -14,7 +14,7 @@
             "defaultValue": "Twm@0987654321",
             "type": "SecureString",
             "metadata": {
-                "description": "The password for the Administrator account of the new VMs. Default value is subscription id"
+                "description": "The password for the Administrator account of the new VMs. Default value is Twm@0987654321"
             }
         },
         "numberOfInstances": {

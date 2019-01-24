@@ -46,15 +46,14 @@
             }
         },
         "osImageSKU": {
-            "defaultValue": "18.04-LTS",
+            "defaultValue": "2016-Datacenter",
             "type": "String",
 			"allowedValues": [
-			    "14.04.5-LTS",
-				"16.04-LTS",
-			    "18.04-LTS"
+			    "2012-R2-Datacenter",
+			    "2016-Datacenter"
 			],
             "metadata": {
-                "description": "The Linux version for the VM. This will pick a fully patched image of this given Ubuntu"
+                "description": "The Windows version for the VM. This will pick a fully patched image of this given Microsoft"
             }
         }
     },
@@ -76,11 +75,11 @@
         "lbFE": "[tolower(concat('external-lb-fe-',resourceGroup().name))]",
         "publiclbFEConfigID": "[concat(variables('publiclbID'),'/frontendIPConfigurations/',variables('lbFE'))]",
         "publicIPAddressName": "[tolower(concat('public-ip',resourceGroup().name))]",
-        "rdpPort": 22,
+        "rdpPort": 3389,
         "nsgName": "[tolower(concat('vmnsg',resourceGroup().name))]",
         "nsgID": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('nsgName'))]",
-		"osImageOffer": "UbuntuServer",
-		"osImagePublisher": "Canonical",
+		"osImageOffer": "WindowsServer",
+		"osImagePublisher": "MicrosoftWindowsServer",
         "vmContainerName": "vhds"
     },
     "resources": [
@@ -192,7 +191,7 @@
         },
         {
             "type": "Microsoft.Network/loadBalancers/inboundNatRules",
-            "name": "[concat(variables('publicLBName'), '/ssh-VM', copyIndex())]",
+            "name": "[concat(variables('publicLBName'), '/RDP-VM', copyIndex())]",
             "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
             "copy": {
@@ -204,8 +203,8 @@
                     "id": "[variables('publiclbFEConfigID')]"
                 },
                 "protocol": "tcp",
-                "frontendPort": "[copyIndex(2200)]",
-                "backendPort": 22,
+                "frontendPort": "[copyIndex(60000)]",
+                "backendPort": "[variables('rdpPort')]",
                 "enableFloatingIP": false
             },
             "dependsOn": [
@@ -236,7 +235,7 @@
                             ],
                             "loadBalancerInboundNatRules": [
                                 {
-                                    "id": "[concat(variables('publiclbID'), '/inboundNatRules/ssh-VM', copyIndex())]"
+                                    "id": "[concat(variables('publiclbID'), '/inboundNatRules/RDP-VM', copyIndex())]"
                                 }
                             ]
                         }
@@ -246,7 +245,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
                 "[concat('Microsoft.Network/loadBalancers/', variables('publicLBName'))]",
-                "[concat('Microsoft.Network/loadBalancers/', variables('publicLBName'), '/inboundNatRules/', 'ssh-VM', copyIndex())]"
+                "[concat('Microsoft.Network/loadBalancers/', variables('publicLBName'), '/inboundNatRules/', 'RDP-VM', copyIndex())]"
             ]
         },
         {
