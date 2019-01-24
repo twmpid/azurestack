@@ -1,0 +1,10 @@
+$tenantARMendporint = "https://management.twm.azurestack.taiwancloud.com.tw"
+$azsEnvname = "AZSTenantEnv"
+$startTime = "2019/01/22"
+$endTime = "2019/01/23"
+# Daily / Hourly
+$periodType = "Daily"
+Add-AzureRmEnvironment -Name "AZSTenantEnv" -ARMEndpoint $tenantARMendporint
+Login-AzureRmAccount -EnvironmentName $azsEnvname 
+$usageReport = Get-UsageAggregates -ReportedStartTime $startTime -ReportedEndTime $endTime -AggregationGranularity $periodType  -ShowDetails $true
+$usageReport.UsageAggregations.properties |select UsageStartTime,UsageEndTime,MeterId,Quantity,InstanceData |Out-GridView
